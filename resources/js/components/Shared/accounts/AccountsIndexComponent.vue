@@ -12,6 +12,11 @@ export default {
     mixins: [
         commonFunctions
     ],
+    data() {
+        return {
+            accounts: this.accounts
+        };
+    },
     created() {
         EventBus.on('accountWasStored', (data) => {
             this.isVisible = false;
