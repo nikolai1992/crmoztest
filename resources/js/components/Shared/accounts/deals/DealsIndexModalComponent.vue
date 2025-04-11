@@ -44,8 +44,8 @@ export default {
                 <tbody>
                     <template v-if="deals.length > 0">
                         <tr v-for="deal in deals">
-                            <td>{{deal.deal_name}}</td>
-                            <td>{{deal.stage}}</td>
+                            <td>{{deal.Deal_Name}}</td>
+                            <td>{{deal.Stage}}</td>
                         </tr>
                     </template>
 

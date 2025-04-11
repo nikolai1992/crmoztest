@@ -126,7 +126,7 @@ class ZohoApiService
     {
         return array_filter($deals, function ($deal) use ($accountId) {
             if ($deal->Account_Name) {
-                return $deal->Account_Name->id === $accountId;
+                return $deal->Account_Name->id == $accountId;
             }
 
         });
