@@ -12,7 +12,7 @@ class ZohoApiService
     {
         $this->accessToken = session()->get('access_token');
     }
-    public function getDeals(null|int $accountId = null)
+    public function getDeals(null|int $accountId = null): array|object
     {
         $response = $this->prepareRequest()->get('{+domain}/deals', []);
 
@@ -23,41 +23,47 @@ class ZohoApiService
             }
             return $deals;
         }
+
+        return [];
     }
-    public function storeDeal(array $formData)
+    public function storeDeal(array $formData): null|string
     {
-        $data = $this->prepeareDataForRequest($formData);
+        $data = $this->prepareDataForRequest($formData);
         $response = $this->prepareRequest()->post('{+domain}/Deals', $data);
         return $this->checkAPIResponse($response);
     }
-    public function updateDeal(int $dealId, array $formData)
+    public function updateDeal(int $dealId, array $formData): ?string
     {
         $formData['id'] = $dealId;
-        $data = $this->prepeareDataForRequest($formData);
+        $data = $this->prepareDataForRequest($formData);
         $response = $this->prepareRequest()->put('{+domain}/Deals', $data);
         return $this->checkAPIResponse($response);
     }
-    public function getAccounts()
+    public function getAccounts(): array|object
     {
         $response = $this->prepareRequest()->get('{+domain}/Accounts', []);
 
         if ($response->successful()) {
             return $response->object()->data;
         }
+
+        return [];
     }
-    public function storeAccount(array $formData)
+    public function storeAccount(array $formData): null|string
     {
-        $data = $this->prepeareDataForRequest($formData);
+        $data = $this->prepareDataForRequest($formData);
         $response = $this->prepareRequest()->post('{+domain}/Accounts', $data);
         return $this->checkAPIResponse($response);
     }
-    public function getDeal(int $dealId)
+    public function getDeal(int $dealId): array|object
     {
         $response = $this->prepareRequest()->get('{+domain}/deals/' . $dealId, []);
 
         if ($response->successful()) {
-            return $response->object()->data[0];
+            return isset($response->object()->data[0]) ? $response->object()->data[0] : [];
         }
+
+        return [];
     }
     private function prepareRequest(): PendingRequest
     {
@@ -97,14 +103,14 @@ class ZohoApiService
             $this->accessToken = $responseData->access_token;
         }
     }
-    private function prepeareDataForRequest(array $formData): array
+    private function prepareDataForRequest(array $formData): array
     {
         $data = [];
         $data['data'][] = $formData;
 
         return $data;
     }
-    private function checkAPIResponse($response)
+    private function checkAPIResponse(\Illuminate\Http\Client\Response $response): null|string
     {
         if ($response->successful()) {
             return response()->json([
@@ -122,13 +128,12 @@ class ZohoApiService
         }
     }
 
-    private function filterDealsByAccountId($deals, $accountId): array
+    private function filterDealsByAccountId(array $deals, string $accountId): array
     {
         return array_filter($deals, function ($deal) use ($accountId) {
             if ($deal->Account_Name) {
                 return $deal->Account_Name->id == $accountId;
             }
-
         });
     }
 }
